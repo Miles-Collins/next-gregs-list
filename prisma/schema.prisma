@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  email String?  @unique
+  emailVerified DateTime? 
+  image String?
+  hashedPassword String?
+  phone Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts Account[]
+  cars Car[]
+  houses House[]
+  jobs Job[]
+}
+
+model Account {
+id String @id @default(auto()) @map("_id") @db.ObjectId
+userId String @db.ObjectId
+type String
+provider String
+providerAccountId String
+refresh_token String? @db.String
+access_token String? @db.String
+expires_at Int?
+token_type String?
+scope String?
+id_token String? @db.String
+session_state String?
+
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+@@unique([provider, providerAccountId])
+}
+
+model Car {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  make String
+  model String
+  year Int
+  price Int
+  color String
+  image String
+  userId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model House {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  address String
+  bedrooms Int
+  bathrooms Int
+  sqft Int
+  year Int
+  price Int
+  description String
+  image String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String @db.ObjectId
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Job {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  subtitle String?
+  pay Int
+  companyName String
+  description String
+  userId String @db.ObjectId
+
+user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
